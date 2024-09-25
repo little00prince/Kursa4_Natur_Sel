@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -160,8 +161,26 @@ public class Simulation extends Application{
     }
 
     private void updateSimulation(Pane simulationPane, StatisticPane statisticPane) {
+        List<Microb> animalsToRemove = new ArrayList<>();
+
         for (Microb microb : microbs) {
-            microb.moveRandomly();
+            if (microb.getEnergy() > 0) {
+                microb.moveRandomly();
+                microb.setEnergy(microb.getEnergy() - 0.04); // Животное теряет энергию
+            } else {
+            // Животное умирает и превращается в единицу пищи
+            Food newFood = new Food(microb.getX(), microb.getY());
+            newFood.setColor(Color.BLACK); // Устанавливаем цвет пищи черным
+            foods.add(newFood);
+            simulationPane.getChildren().add(newFood);
+            animalsToRemove.add(microb); // Отмечаем животное для удаления
+            }
+        }
+
+        // Удаляем отмеченные для удаления животные
+        for (Microb microb : animalsToRemove) {
+            microbs.remove(microb);
+            simulationPane.getChildren().remove(microb);
         }
     }
 

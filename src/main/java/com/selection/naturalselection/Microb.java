@@ -95,6 +95,10 @@ public class Microb extends ImageView {
         return size;
     }
 
+    public void setEnergy(double energy) {
+        this.energy = energy;
+    }
+
     public void moveTowards(Food food) {
         double dx = food.getCenterX() - this.getX();
         double dy = food.getCenterY() - this.getY();
@@ -149,7 +153,11 @@ public class Microb extends ImageView {
         if (food != null) {
             moveTowards(food);
             if (isInContactWithFood(food)) {
+                setEnergy(getEnergy() + 30); // Животное получает энергию
                 simulation.removeFood(food);
+
+            } else {
+                setEnergy(getEnergy() - 0.04); // Животное теряет энергию
             }
         } else {
             double newX = this.getX() + moveDirectionX * getSpeed();
