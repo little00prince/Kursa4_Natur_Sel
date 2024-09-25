@@ -24,10 +24,13 @@ public class Simulation extends Application{
     private List<Food> foods = new ArrayList<>();
     private boolean isPaused = false;
     private Timeline foodSpawnTimer; // Таймер для спауна пищи
+    private List<Microb> microbs = new ArrayList<>();
 
     private static final double SIMULATION_WIDTH = 700;
     private static final double SIMULATION_HEIGHT = 700;
-    private static final double BORDER_MARGIN = 50;
+    private static final double BORDER_MARGIN = 50; // Маржа от границы экрана, внутри которой еда не будет спавниться
+    private static final double STATISTIC_PANE_HEIGHT = 200; // Ширина панели статистики
+    private static final double ANIMAL_SPAWN_MARGIN = STATISTIC_PANE_HEIGHT + BORDER_MARGIN; // Маржа для спавна животных
 
     @Override
     public void start(Stage primaryStage) {
@@ -36,7 +39,7 @@ public class Simulation extends Application{
         ImageView imageView = new ImageView();
         imageView.setImage(image);
 
-        ImageView background = createBackground("C:\\Kursa4_Natural_selection\\src\\main\\resources\\fon.jpg");
+        ImageView background = createBackground("C:\\Kursa4_Natural_selection\\src\\main\\resources\\com.selection.naturalselection\\fon.jpg");
         simulationPane.getChildren().add(background);
 
         // Создание корневого макета
@@ -49,6 +52,7 @@ public class Simulation extends Application{
         primaryStage.setScene(scene);
         primaryStage.show();
 
+        initializeAnimals(10, simulationPane); // Инициализация 10 микробов
         spawnFood(20, simulationPane); // Спавн 20 единиц пищи
 
         // Обработчик изменения времени до новой пищи
@@ -133,6 +137,16 @@ public class Simulation extends Application{
             Food food = new Food(x, y);
             foods.add(food);
             simulationPane.getChildren().add(food);
+        }
+    }
+
+    private void initializeAnimals(int count, Pane simulationPane) {
+        for (int i = 0; i < count; i++) {
+            double x = BORDER_MARGIN + random.nextDouble() * (SIMULATION_WIDTH - ANIMAL_SPAWN_MARGIN);
+            double y = BORDER_MARGIN + random.nextDouble() * (SIMULATION_HEIGHT - 2 * BORDER_MARGIN);
+            Microb microb = new Microb(x, y, 20, this);
+            microbs.add(microb);
+            simulationPane.getChildren().add(microb);
         }
     }
 
