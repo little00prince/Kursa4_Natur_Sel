@@ -6,7 +6,7 @@ import javafx.scene.image.ImageView;
 
 import java.util.List;
 import java.util.Random;
-
+//Объявление класса и переменных
 public class Microb extends ImageView {
     private double energy;
     private double size;
@@ -91,8 +91,9 @@ public class Microb extends ImageView {
     public double getSpeed() {
         return speed + (speed / (4 * Math.sqrt(size)));    }
 
-    public double getSize() {
-        return size;
+
+    public double getInteractionRadius() {
+        return interactionRadius;
     }
 
     public void setEnergy(double energy) {
@@ -210,6 +211,7 @@ public class Microb extends ImageView {
             // Это животное съедает другое
             this.setEnergy(this.getEnergy() + other.getEnergy() / 10);
             this.incrementFoodCount();
+            simulation.predationDeaths++; // Увеличиваем счетчик смертей от хищничества
             simulation.removeAnimal(other);
         } else {
             // Отталкивание
@@ -280,11 +282,17 @@ public class Microb extends ImageView {
         return distance < (this.size + other.size) / 2;
     }
 
+    public boolean isColliding(double newX, double newY, Microb other) {
+        double dx = other.getX() - newX;
+        double dy = other.getY() - newY;
+        double distance = Math.sqrt(dx * dx + dy * dy);
+        return distance < (this.size + other.size) / 2;
+    }
+
     public void moveRandomly() {
         if (moveTicks <= 0 || isAtEdge()) {
             setRandomDirection();
         }
-
         Microb prey = findPrey();
         if (prey != null) {
             moveTowards(prey);
@@ -303,7 +311,6 @@ public class Microb extends ImageView {
                         setEnergy(getEnergy() + 30); // Животное получает энергию
                         incrementFoodCount(); // Увеличиваем счетчик пищи
                         simulation.removeFood(food);
-
                     } else {
                         setEnergy(getEnergy() - 0.04); // Животное теряет энергию
                     }
@@ -319,10 +326,20 @@ public class Microb extends ImageView {
                         this.setY(newY);
                     }
 
+                    List<Microb> microbs = simulation.getAnimals();
+                    for (Microb other : microbs) {
+                        if (other != this && isColliding(newX, newY, other)) {
+                            if (this.size > other.size * 1.4) {
+                                continue;
+                            }
+                            setRandomDirection();
+                            return;
+                        }
+                    }
 
+                    moveTicks--;
 
                 }
-                moveTicks--;
             }
         }
     }
@@ -338,14 +355,7 @@ public class Microb extends ImageView {
         newMicrob.setSize(newSize);
         newMicrob.setInteractionRadius(newInteractionRadius);
 
-
         simulation.addAnimal(newMicrob);
     }
-
-
-
-
-
-
 }
 

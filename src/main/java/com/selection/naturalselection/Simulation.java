@@ -162,21 +162,29 @@ public class Simulation extends Application{
     }
 
     public int newanimals = 0;
+    public int energyDepletionDeaths = 0;
+    public int predationDeaths = 0;
 
     private void updateSimulation(Pane simulationPane, StatisticPane statisticPane) {
         List<Microb> animalsToRemove = new ArrayList<>();
+
+        statisticPane.updateEnergyDepletionDeaths(energyDepletionDeaths);
+        statisticPane.updatePredationDeaths(predationDeaths);
+        statisticPane.updateNewAnimals(newanimals);
+        statisticPane.updateCurrentAnimals(microbs.size());
 
         for (Microb microb : microbs) {
             if (microb.getEnergy() > 0) {
                 microb.moveRandomly();
                 microb.setEnergy(microb.getEnergy() - 0.04); // Животное теряет энергию
             } else {
-            // Животное умирает и превращается в единицу пищи
-            Food newFood = new Food(microb.getX(), microb.getY());
-            newFood.setColor(Color.BLACK); // Устанавливаем цвет пищи черным
-            foods.add(newFood);
-            simulationPane.getChildren().add(newFood);
-            animalsToRemove.add(microb); // Отмечаем животное для удаления
+                energyDepletionDeaths++; // Увеличиваем счетчик смертей от недостатка энергии
+                // Животное умирает и превращается в единицу пищи
+                Food newFood = new Food(microb.getX(), microb.getY());
+                newFood.setColor(Color.BLACK); // Устанавливаем цвет пищи черным
+                foods.add(newFood);
+                simulationPane.getChildren().add(newFood);
+                animalsToRemove.add(microb); // Отмечаем животное для удаления
             }
         }
 

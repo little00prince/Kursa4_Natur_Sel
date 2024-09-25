@@ -17,11 +17,27 @@ public class StatisticPane extends VBox {
     private TextField TimeSpawnTextField;
     private Label SimulationEditionLabel;
     public Button PauseButton;
+    private Label energyDepletionDeathsLabel;
+    private Label predationDeathsLabel;
+    private Label birthsLabel;
+    private Label currentAnimalsLabel;
 
     public StatisticPane() {
 
         titleLabel = new Label("Статистика");
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+
+        energyDepletionDeathsLabel = new Label("С: 0   ");
+        energyDepletionDeathsLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
+
+        predationDeathsLabel = new Label("Съедено хищниками: 0");
+        predationDeathsLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
+
+        birthsLabel = new Label("Родилось микробов: 0    ");
+        birthsLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
+
+        currentAnimalsLabel = new Label("Микробов в симуляции: 0");
+        currentAnimalsLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
 
         FoodSpawnLabel = new Label("Количество появляющейся еды");
         FoodSpawnLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 12));
@@ -57,9 +73,15 @@ public class StatisticPane extends VBox {
         HBox foodSpawnBox = new HBox(FoodSpawnLabel, foodSpawnTextField);
         foodSpawnBox.setSpacing(10);
 
+        HBox BoxN3 = new HBox(energyDepletionDeathsLabel, predationDeathsLabel);
+        BoxN3.setSpacing(10);
+
+        HBox BoxN4 = new HBox(birthsLabel,  currentAnimalsLabel);
+        BoxN4.setSpacing(10);
+
         this.getChildren().addAll(
-                titleLabel, SimulationEditionLabel, FoodSpawnLabel, foodSpawnTextField,
-                TimeSpawnLabel, TimeSpawnTextField, PauseButton);
+                titleLabel, BoxN3, BoxN4, SimulationEditionLabel, FoodSpawnLabel, foodSpawnTextField,
+                TimeSpawnLabel, TimeSpawnTextField, foodSpawnBox, BoxN2, PauseButton);
     }
 
     //Метод для получения значения количества пищи, которое ввел пользователь
@@ -112,4 +134,23 @@ public class StatisticPane extends VBox {
         int amount = Integer.parseInt(text); // Пытаемся преобразовать текст в число
         return amount; // Возвращаем число, если оно меньше 150
     }
+
+    public void updateEnergyDepletionDeaths(int count) {
+        energyDepletionDeathsLabel.setText("Умерли от голода: " + count);
+    }
+
+    public void updateNewAnimals(int count) {
+        birthsLabel.setText("Появилось новых микробов: " + count);
+    }
+
+    public void updateCurrentAnimals(int count) {
+        currentAnimalsLabel.setText("В симуляции: " + count);
+    }
+
+    public void updatePredationDeaths(int count) {
+        predationDeathsLabel.setText("   Съедено хищниками: " + count);
+    }
+
+
+
 }
