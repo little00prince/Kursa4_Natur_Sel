@@ -184,7 +184,9 @@ public class Simulation extends Application{
         }
     }
 
-
+    public List<Microb> getAnimals() {
+        return microbs;
+    }
 
 
         public static void main(String[] args){

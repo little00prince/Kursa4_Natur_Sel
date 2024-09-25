@@ -144,26 +144,32 @@ public class Microb extends ImageView {
         return distance < this.size;
     }
 
-    public void moveRandomly() {
-        if (moveTicks <= 0 || isAtEdge()) {
-            setRandomDirection();
-        }
-
-        Food food = findFood();
-        if (food != null) {
-            moveTowards(food);
-            if (isInContactWithFood(food)) {
-                setEnergy(getEnergy() + 30); // Животное получает энергию
-                simulation.removeFood(food);
-
-            } else {
-                setEnergy(getEnergy() - 0.04); // Животное теряет энергию
+    private Microb findThreat() {
+        Microb closestThreat = null;
+        double closestDistance = Double.MAX_VALUE;
+        for (Microb other : simulation.getAnimals()) {
+            if (other != this && other.size > this.size * 1.4) { // Проверка на 40% больше
+                double distance = Math.sqrt(Math.pow(this.getX() - other.getX(), 2) + Math.pow(this.getY() - other.getY(), 2));
+                if (distance < this.interactionRadius && distance < closestDistance) {
+                    closestDistance = distance;
+                    closestThreat = other;
+                }
             }
-        } else {
-            double newX = this.getX() + moveDirectionX * getSpeed();
-            double newY = this.getY() + moveDirectionY * getSpeed();
+        }
+        return closestThreat;
+    }
 
-            // Проверка, чтобы не выходить за край SimulationPane
+    public void moveAwayFrom(Microb threat) {
+        double dx = this.getX() - threat.getX();
+        double dy = this.getY() - threat.getY();
+        double distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > 1) {
+            dx /= distance;
+            dy /= distance;
+            double newX = this.getX() + dx * getSpeed();
+            double newY = this.getY() + dy * getSpeed();
+
             if (newX >= 0 && newX <= SIMULATION_WIDTH - size) {
                 this.setX(newX);
             }
@@ -171,8 +177,47 @@ public class Microb extends ImageView {
                 this.setY(newY);
             }
 
+            // Изменяем направление если микроб уперся в границу экрана
+            if (isAtEdge()) {
+                setRandomDirection();
+            }
         }
-        moveTicks--;
+    }
+
+    public void moveRandomly() {
+        if (moveTicks <= 0 || isAtEdge()) {
+            setRandomDirection();
+        }
+
+        Microb threat = findThreat();
+        if (threat != null) {
+            moveAwayFrom(threat);
+        } else {
+            Food food = findFood();
+            if (food != null) {
+                moveTowards(food);
+                if (isInContactWithFood(food)) {
+                    setEnergy(getEnergy() + 30); // Животное получает энергию
+                    simulation.removeFood(food);
+
+                } else {
+                    setEnergy(getEnergy() - 0.04); // Животное теряет энергию
+                }
+            } else {
+                double newX = this.getX() + moveDirectionX * getSpeed();
+                double newY = this.getY() + moveDirectionY * getSpeed();
+
+                // Проверка, чтобы не выходить за край SimulationPane
+                if (newX >= 0 && newX <= SIMULATION_WIDTH - size) {
+                    this.setX(newX);
+                }
+                if (newY >= 0 && newY <= SIMULATION_HEIGHT - size) {
+                    this.setY(newY);
+                }
+
+            }
+            moveTicks--;
+        }
     }
 
 
