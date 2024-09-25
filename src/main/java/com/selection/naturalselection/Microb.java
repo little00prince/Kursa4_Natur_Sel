@@ -99,6 +99,27 @@ public class Microb extends ImageView {
         this.energy = energy;
     }
 
+    public void setSize(double size) {
+        this.size = size;
+        updateImageSize();
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    public void setInteractionRadius(double interactionRadius) {
+        this.interactionRadius = interactionRadius;
+    }
+
+    public void incrementFoodCount() {
+        foodCount++;
+        if (foodCount > 3) {
+            reproduce();
+            foodCount = 0;
+        }
+    }
+
     public void moveTowards(Food food) {
         double dx = food.getCenterX() - this.getX();
         double dy = food.getCenterY() - this.getY();
@@ -188,6 +209,7 @@ public class Microb extends ImageView {
         if (this.size > other.size * 1.4) { // Проверка на 40% больше
             // Это животное съедает другое
             this.setEnergy(this.getEnergy() + other.getEnergy() / 10);
+            this.incrementFoodCount();
             simulation.removeAnimal(other);
         } else {
             // Отталкивание
@@ -279,6 +301,7 @@ public class Microb extends ImageView {
                     moveTowards(food);
                     if (isInContactWithFood(food)) {
                         setEnergy(getEnergy() + 30); // Животное получает энергию
+                        incrementFoodCount(); // Увеличиваем счетчик пищи
                         simulation.removeFood(food);
 
                     } else {
@@ -296,10 +319,27 @@ public class Microb extends ImageView {
                         this.setY(newY);
                     }
 
+
+
                 }
                 moveTicks--;
             }
         }
+    }
+
+    //Метод "рождения" нового животного с новыми характеристиками
+    private void reproduce() {
+        double newSpeed = this.speed * (0.6 + random.nextDouble() *0.7); // Новый животное получает скорость в диапазоне от 90% до 110% от родительской
+        double newSize = this.size * (0.6 + random.nextDouble() * 0.7); // Новый животное получает размер в диапазоне от 60% до 90% от родительской
+        double newInteractionRadius = this.interactionRadius * (0.9 + random.nextDouble() * 0.2); // Новый животное получает радиус в диапазоне от 90% до 130% от родительского
+
+        Microb newMicrob = new Microb(this.getX(), this.getY(), this.energy / 2, simulation);
+        newMicrob.setSpeed(newSpeed);
+        newMicrob.setSize(newSize);
+        newMicrob.setInteractionRadius(newInteractionRadius);
+
+
+        simulation.addAnimal(newMicrob);
     }
 
 

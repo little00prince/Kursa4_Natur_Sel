@@ -26,6 +26,7 @@ public class Simulation extends Application{
     private boolean isPaused = false;
     private Timeline foodSpawnTimer; // Таймер для спауна пищи
     private List<Microb> microbs = new ArrayList<>();
+    private List<Microb> newMicrobs = new ArrayList<>();
 
     private static final double SIMULATION_WIDTH = 700;
     private static final double SIMULATION_HEIGHT = 700;
@@ -160,6 +161,8 @@ public class Simulation extends Application{
         simulationPane.getChildren().remove(food);
     }
 
+    public int newanimals = 0;
+
     private void updateSimulation(Pane simulationPane, StatisticPane statisticPane) {
         List<Microb> animalsToRemove = new ArrayList<>();
 
@@ -182,6 +185,25 @@ public class Simulation extends Application{
             microbs.remove(microb);
             simulationPane.getChildren().remove(microb);
         }
+
+        // Добавление новых животных после итерации
+        if (!newMicrobs.isEmpty()) {
+            microbs.addAll(newMicrobs);
+            newanimals += 1;
+            simulationPane.getChildren().addAll(newMicrobs);
+            newMicrobs.clear();
+        }
+
+        // Проверка коллизий между животными
+        for (int i = 0; i < microbs.size(); i++) {
+            Microb microb1 = microbs.get(i);
+            for (int j = i + 1; j < microbs.size(); j++) {
+                Microb microb2 = microbs.get(j);
+                if (microb1.isColliding(microb2)) {
+                    microb1.resolveCollision(microb2);
+                }
+            }
+        }
     }
 
     public List<Microb> getAnimals() {
@@ -191,6 +213,33 @@ public class Simulation extends Application{
     public void removeAnimal(Microb microb) {
         microbs.remove(microb);
         simulationPane.getChildren().remove(microb);
+    }
+
+    public void addAnimal(Microb microb) {
+        // Смещение по осям x и y для нового животного
+        double offsetX = random.nextDouble() * 40 - 20; // случайное смещение от -20 до 20 по оси x
+        double offsetY = random.nextDouble() * 40 - 20; // случайное смещение от -20 до 20 по оси y
+
+        double newX = microb.getX() + offsetX;
+        double newY = microb.getY() + offsetY;
+
+        // Проверка на границы спавна животных
+        if (newX < BORDER_MARGIN) {
+            newX = BORDER_MARGIN;
+        } else if (newX > SIMULATION_WIDTH - ANIMAL_SPAWN_MARGIN) {
+            newX = SIMULATION_WIDTH - ANIMAL_SPAWN_MARGIN;
+        }
+
+        if (newY < BORDER_MARGIN) {
+            newY = BORDER_MARGIN;
+        } else if (newY > SIMULATION_HEIGHT - BORDER_MARGIN) {
+            newY = SIMULATION_HEIGHT - BORDER_MARGIN;
+        }
+
+        microb.setX(newX);
+        microb.setY(newY);
+
+        newMicrobs.add(microb);
     }
 
 
