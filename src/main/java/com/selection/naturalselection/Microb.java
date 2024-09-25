@@ -184,39 +184,121 @@ public class Microb extends ImageView {
         }
     }
 
+    public void resolveCollision(Microb other) {
+        if (this.size > other.size * 1.4) { // Проверка на 40% больше
+            // Это животное съедает другое
+            this.setEnergy(this.getEnergy() + other.getEnergy() / 10);
+            simulation.removeAnimal(other);
+        } else {
+            // Отталкивание
+            double dx = other.getX() - this.getX();
+            double dy = other.getY() - this.getY();
+            double distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance > 0) {
+                dx /= distance;
+                dy /= distance;
+
+                double newThisX = this.getX() - dx * this.getSpeed();
+                double newThisY = this.getY() - dy * this.getSpeed();
+                double newOtherX = other.getX() + dx * other.getSpeed();
+                double newOtherY = other.getY() + dy * other.getSpeed();
+
+                this.setX(Math.max(0, Math.min(SIMULATION_WIDTH - size, newThisX)));
+                this.setY(Math.max(0, Math.min(SIMULATION_HEIGHT - size, newThisY)));
+                other.setX(Math.max(0, Math.min(SIMULATION_WIDTH - size, newOtherX)));
+                other.setY(Math.max(0, Math.min(SIMULATION_HEIGHT - size, newOtherY)));
+            }
+        }
+    }
+
+    private Microb findPrey() {
+        Microb closestPrey = null;
+        double closestDistance = Double.MAX_VALUE;
+        for (Microb other : simulation.getAnimals()) {
+            if (other != this && this.size > other.size * 1.4) { // Проверка на 40% больше
+                double distance = Math.sqrt(Math.pow(this.getX() - other.getX(), 2) + Math.pow(this.getY() - other.getY(), 2));
+                if (distance < this.interactionRadius && distance < closestDistance) {
+                    closestDistance = distance;
+                    closestPrey = other;
+                }
+            }
+        }
+        return closestPrey;
+    }
+
+    public void moveTowards(Microb target) {
+        double dx = target.getX() - this.getX();
+        double dy = target.getY() - this.getY();
+        double distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > 1) {
+            dx /= distance;
+            dy /= distance;
+            double newX = this.getX() + dx * getSpeed();
+            double newY = this.getY() + dy * getSpeed();
+
+            if (newX >= 0 && newX <= SIMULATION_WIDTH - size) {
+                this.setX(newX);
+            }
+            if (newY >= 0 && newY <= SIMULATION_HEIGHT - size) {
+                this.setY(newY);
+            }
+
+
+            if (isAtEdge()) {
+                setRandomDirection();
+            }
+        }
+    }
+
+    public boolean isColliding(Microb other) {
+        double dx = other.getX() - this.getX();
+        double dy = other.getY() - this.getY();
+        double distance = Math.sqrt(dx * dx + dy * dy);
+        return distance < (this.size + other.size) / 2;
+    }
+
     public void moveRandomly() {
         if (moveTicks <= 0 || isAtEdge()) {
             setRandomDirection();
         }
 
-        Microb threat = findThreat();
-        if (threat != null) {
-            moveAwayFrom(threat);
-        } else {
-            Food food = findFood();
-            if (food != null) {
-                moveTowards(food);
-                if (isInContactWithFood(food)) {
-                    setEnergy(getEnergy() + 30); // Животное получает энергию
-                    simulation.removeFood(food);
-
-                } else {
-                    setEnergy(getEnergy() - 0.04); // Животное теряет энергию
-                }
-            } else {
-                double newX = this.getX() + moveDirectionX * getSpeed();
-                double newY = this.getY() + moveDirectionY * getSpeed();
-
-                // Проверка, чтобы не выходить за край SimulationPane
-                if (newX >= 0 && newX <= SIMULATION_WIDTH - size) {
-                    this.setX(newX);
-                }
-                if (newY >= 0 && newY <= SIMULATION_HEIGHT - size) {
-                    this.setY(newY);
-                }
-
+        Microb prey = findPrey();
+        if (prey != null) {
+            moveTowards(prey);
+            if (isColliding(prey)) {
+                resolveCollision(prey);
             }
-            moveTicks--;
+        } else {
+            Microb threat = findThreat();
+            if (threat != null) {
+                moveAwayFrom(threat);
+            } else {
+                Food food = findFood();
+                if (food != null) {
+                    moveTowards(food);
+                    if (isInContactWithFood(food)) {
+                        setEnergy(getEnergy() + 30); // Животное получает энергию
+                        simulation.removeFood(food);
+
+                    } else {
+                        setEnergy(getEnergy() - 0.04); // Животное теряет энергию
+                    }
+                } else {
+                    double newX = this.getX() + moveDirectionX * getSpeed();
+                    double newY = this.getY() + moveDirectionY * getSpeed();
+
+                    // Проверка, чтобы не выходить за край SimulationPane
+                    if (newX >= 0 && newX <= SIMULATION_WIDTH - size) {
+                        this.setX(newX);
+                    }
+                    if (newY >= 0 && newY <= SIMULATION_HEIGHT - size) {
+                        this.setY(newY);
+                    }
+
+                }
+                moveTicks--;
+            }
         }
     }
 

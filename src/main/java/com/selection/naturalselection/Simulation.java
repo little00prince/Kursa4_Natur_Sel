@@ -188,6 +188,11 @@ public class Simulation extends Application{
         return microbs;
     }
 
+    public void removeAnimal(Microb microb) {
+        microbs.remove(microb);
+        simulationPane.getChildren().remove(microb);
+    }
+
 
         public static void main(String[] args){
         launch(args);
