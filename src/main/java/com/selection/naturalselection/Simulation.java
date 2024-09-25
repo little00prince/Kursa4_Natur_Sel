@@ -161,17 +161,76 @@ public class Simulation extends Application{
         simulationPane.getChildren().remove(food);
     }
 
+    public double getSRAnimalSize() {
+        if (microbs.isEmpty()) return 0;
+        double SRSize = microbs.get(0).getSize();
+        int count = 0;
+        for (Microb microb : microbs) {
+            count++;
+            SRSize = SRSize + microb.getSize();
+        }
+        SRSize = SRSize / count;
+        return SRSize;
+    }
+
+    public double getSRAnimalSpeed() {
+        if (microbs.isEmpty()) return 0;
+        double SRSpeed = microbs.get(0).getSpeed();
+        int count = 0;
+        for (Microb microb : microbs) {
+            count++;
+            SRSpeed = SRSpeed + microb.getSpeed();
+        }
+        SRSpeed = SRSpeed / count;
+        return SRSpeed;
+    }
+
+    public double getSRAnimalRadius() {
+        if (microbs.isEmpty()) return 0;
+        double SRRadius = microbs.get(0).getInteractionRadius();
+        int count = 0;
+        for (Microb microb : microbs) {
+            count++;
+            SRRadius = SRRadius + microb.getInteractionRadius();
+        }
+        SRRadius = SRRadius / count;
+        return SRRadius;
+    }
+
     public int newanimals = 0;
     public int energyDepletionDeaths = 0;
     public int predationDeaths = 0;
+    public double SRSize = 0;
+    public double FirstSize = 0;
+    public double SRSpeed = 0;
+    public double FirstSpeed = 0;
+    public double SRRadius = 0;
+    public double FirstRadius = 0;
+    public int flag = 1;
 
     private void updateSimulation(Pane simulationPane, StatisticPane statisticPane) {
         List<Microb> animalsToRemove = new ArrayList<>();
+        SRSize = getSRAnimalSize();
+        SRSpeed = getSRAnimalSpeed();
+        SRRadius = getSRAnimalRadius();
+
+        if (flag == 1) {
+            FirstSize = microbs.get(0).getSize();
+            FirstSpeed = microbs.get(0).getSpeed();
+            FirstRadius = microbs.get(0).getInteractionRadius();
+            flag = 0;
+        }
 
         statisticPane.updateEnergyDepletionDeaths(energyDepletionDeaths);
         statisticPane.updatePredationDeaths(predationDeaths);
         statisticPane.updateNewAnimals(newanimals);
         statisticPane.updateCurrentAnimals(microbs.size());
+        statisticPane.updateSRAnimalSize(SRSize);
+        statisticPane.FirstAnimalSize(FirstSize);
+        statisticPane.updateSRAnimalSpeed(SRSpeed);
+        statisticPane.FirstAnimalSpeed(FirstSpeed);
+        statisticPane.updateSRAnimalRadius(SRRadius);
+        statisticPane.FirstAnimalRadius(FirstRadius);
 
         for (Microb microb : microbs) {
             if (microb.getEnergy() > 0) {

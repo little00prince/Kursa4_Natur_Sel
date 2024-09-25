@@ -91,6 +91,9 @@ public class Microb extends ImageView {
     public double getSpeed() {
         return speed + (speed / (4 * Math.sqrt(size)));    }
 
+    public double getSize() {
+        return size;
+    }
 
     public double getInteractionRadius() {
         return interactionRadius;

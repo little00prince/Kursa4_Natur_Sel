@@ -5,6 +5,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -21,6 +23,12 @@ public class StatisticPane extends VBox {
     private Label predationDeathsLabel;
     private Label birthsLabel;
     private Label currentAnimalsLabel;
+    private Label SRAnimalSizeLabel;
+    private Label FirstAnimalSizeLabel;
+    private Label SRAnimalSpeedLabel;
+    private Label FirstAnimalSpeedLabel;
+    private Label SRAnimalRadiusLabel;
+    private Label FirstAnimalRadiusLabel;
 
     public StatisticPane() {
 
@@ -38,6 +46,24 @@ public class StatisticPane extends VBox {
 
         currentAnimalsLabel = new Label("Микробов в симуляции: 0");
         currentAnimalsLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
+
+        SRAnimalSizeLabel = new Label("Средний размер микроба: 0");
+        SRAnimalSizeLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
+
+        FirstAnimalSizeLabel = new Label("Размер первого микроба:");
+        FirstAnimalSizeLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
+
+        SRAnimalSpeedLabel = new Label("Средняя скорость микроба: 0");
+        SRAnimalSpeedLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
+
+        FirstAnimalSpeedLabel = new Label("Cкорость первого микроба: 0");
+        FirstAnimalSpeedLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
+
+        SRAnimalRadiusLabel = new Label("Средний радиус зрения: 0");
+        SRAnimalRadiusLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
+
+        FirstAnimalRadiusLabel = new Label("Радиус зрения первого микроба: 0");
+        FirstAnimalRadiusLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
 
         FoodSpawnLabel = new Label("Количество появляющейся еды");
         FoodSpawnLabel.setFont(Font.font("Arial", FontPosture.REGULAR, 12));
@@ -79,9 +105,28 @@ public class StatisticPane extends VBox {
         HBox BoxN4 = new HBox(birthsLabel,  currentAnimalsLabel);
         BoxN4.setSpacing(10);
 
+        Line separator1 = createSeparator(Color.BLUE);
+        Line separator2 = createSeparator(Color.BLUE);
+        Line separator3 = createSeparator(Color.BLUE);
+        Line separator4 = createSeparator(Color.BLUE);
+        Line separator5 = createSeparator(Color.BLUE);
+        Line separator6 = createSeparator(Color.BLUE);
+        Line separator7 = createSeparator(Color.BLUE);
+
         this.getChildren().addAll(
-                titleLabel, BoxN3, BoxN4, SimulationEditionLabel, FoodSpawnLabel, foodSpawnTextField,
-                TimeSpawnLabel, TimeSpawnTextField, foodSpawnBox, BoxN2, PauseButton);
+                titleLabel, separator1, BoxN3, BoxN4, separator2, SRAnimalSizeLabel, FirstAnimalSizeLabel, separator6, SRAnimalSpeedLabel, FirstAnimalSpeedLabel, separator7, SRAnimalRadiusLabel, FirstAnimalRadiusLabel,
+                separator3, SimulationEditionLabel, separator4, FoodSpawnLabel, foodSpawnTextField,
+                TimeSpawnLabel, TimeSpawnTextField, foodSpawnBox, BoxN2, separator5, PauseButton);
+
+        this.setStyle("-fx-background-color: lightgray; -fx-padding: 10; -fx-spacing: 10;");
+    }
+
+    //Метод создания разделительных линий
+    private Line createSeparator(Color color) {
+        Line separator = new Line(0, 0, 400, 0);
+        separator.setStroke(color);
+        separator.setStrokeWidth(2);
+        return separator;
     }
 
     //Метод для получения значения количества пищи, которое ввел пользователь
@@ -151,6 +196,35 @@ public class StatisticPane extends VBox {
         predationDeathsLabel.setText("   Съедено хищниками: " + count);
     }
 
+    public void updateSRAnimalSize(double size) {
+        String si = String.format("%.4f", size);
+        SRAnimalSizeLabel.setText("Средний размер: " + si);
+    }
+
+    public void FirstAnimalSize(double size) {
+        String si = String.format("%.4f", size);
+        FirstAnimalSizeLabel.setText("Размер первого микроба: " + si);
+    }
+
+    public void updateSRAnimalSpeed(double speed) {
+        String sp = String.format("%.4f", speed);
+        SRAnimalSpeedLabel.setText("Средняя скорость: " + sp);
+    }
+
+    public void FirstAnimalSpeed(double speed) {
+        String sp = String.format("%.4f", speed);
+        FirstAnimalSpeedLabel.setText("Скорость первого микроба: " + sp);
+    }
+
+    public void updateSRAnimalRadius(double radius) {
+        String ra = String.format("%.4f", radius);
+        SRAnimalRadiusLabel.setText("Средний радиус зрения: " + ra);
+    }
+
+    public void FirstAnimalRadius(double radius) {
+        String ra = String.format("%.4f", radius);
+        FirstAnimalRadiusLabel.setText("Радиус зрения первого микроба: " + ra);
+    }
 
 
 }
