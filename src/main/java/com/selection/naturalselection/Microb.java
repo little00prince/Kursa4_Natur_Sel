@@ -4,6 +4,7 @@ import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.util.List;
 import java.util.Random;
 
 public class Microb extends ImageView {
@@ -82,5 +83,94 @@ public class Microb extends ImageView {
         }
         return angle;
     }
+
+    public double getEnergy() {
+        return energy;
+    }
+
+    public double getSpeed() {
+        return speed + (speed / (4 * Math.sqrt(size)));    }
+
+    public double getSize() {
+        return size;
+    }
+
+    public void moveTowards(Food food) {
+        double dx = food.getCenterX() - this.getX();
+        double dy = food.getCenterY() - this.getY();
+        double distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > 1) {
+            dx /= distance;
+            dy /= distance;
+            double newX = this.getX() + dx * getSpeed();
+            double newY = this.getY() + dy * getSpeed();
+
+            if (newX >= 0 && newX <= SIMULATION_WIDTH - size) {
+                this.setX(newX);
+            }
+            if (newY >= 0 && newY <= SIMULATION_HEIGHT - size) {
+                this.setY(newY);
+            }
+
+
+            if (isAtEdge()) {
+                setRandomDirection();
+            }
+        }
+    }
+
+    private Food findFood() {
+        Food closestFood = null;
+        double closestDistance = Double.MAX_VALUE;
+        for (Food food : simulation.getFood()) {
+            double distance = Math.sqrt(Math.pow(this.getX() - food.getCenterX(), 2) + Math.pow(this.getY() - food.getCenterY(), 2));
+            if (distance < this.interactionRadius && distance < closestDistance) {
+                closestDistance = distance;
+                closestFood = food;
+            }
+        }
+        return closestFood;
+    }
+
+    public boolean isInContactWithFood(Food food) {
+        double dx = food.getCenterX() - this.getX();
+        double dy = food.getCenterY() - this.getY();
+        double distance = Math.sqrt(dx * dx + dy * dy);
+        return distance < this.size;
+    }
+
+    public void moveRandomly() {
+        if (moveTicks <= 0 || isAtEdge()) {
+            setRandomDirection();
+        }
+
+        Food food = findFood();
+        if (food != null) {
+            moveTowards(food);
+            if (isInContactWithFood(food)) {
+                simulation.removeFood(food);
+            }
+        } else {
+            double newX = this.getX() + moveDirectionX * getSpeed();
+            double newY = this.getY() + moveDirectionY * getSpeed();
+
+            // Проверка, чтобы не выходить за край SimulationPane
+            if (newX >= 0 && newX <= SIMULATION_WIDTH - size) {
+                this.setX(newX);
+            }
+            if (newY >= 0 && newY <= SIMULATION_HEIGHT - size) {
+                this.setY(newY);
+            }
+
+        }
+        moveTicks--;
+    }
+
+
+
+
+
+
 }
 

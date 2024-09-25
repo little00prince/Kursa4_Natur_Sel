@@ -150,8 +150,19 @@ public class Simulation extends Application{
         }
     }
 
-    private void updateSimulation(Pane simulationPane, StatisticPane statisticPane) {
+    public List<Food> getFood() {
+        return foods;
+    }
 
+    public void removeFood(Food food) {
+        foods.remove(food);
+        simulationPane.getChildren().remove(food);
+    }
+
+    private void updateSimulation(Pane simulationPane, StatisticPane statisticPane) {
+        for (Microb microb : microbs) {
+            microb.moveRandomly();
+        }
     }
 
 
